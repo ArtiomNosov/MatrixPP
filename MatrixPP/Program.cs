@@ -1,4 +1,7 @@
-﻿using System;
+using System;
+using System.Threading;
+using System.Diagnostics;
+
 
 // класс с методами расширения
 class Matrix
@@ -6,24 +9,25 @@ class Matrix
     public double[,] Data;
     private static uint[] _dimension = new uint[2];
     // метод расширения для получения количества строк матрицы
-    public uint Dimension(uint dimension)
+    public uint[] GetDimension()
     {
-        _dimension[0] = (uint)Data.GetUpperBound(0) + 1;
-        _dimension[1] = (uint)Data.GetUpperBound(1) + 1;
-        return _dimension[dimension];
+        return _dimension;
     }
 
+    // 1. Конструкторы матриц
     public Matrix(uint n, uint m)
     {
         Data = new double[n, m];
+        _dimension[0] = (uint)Data.GetUpperBound(0) + 1;
+        _dimension[1] = (uint)Data.GetUpperBound(1) + 1;
     }
 
     public Matrix(Matrix matrix)
     {
-        double[,] newData = new double[matrix.Dimension(0), matrix.Dimension(1)];
-        for (var i = 0; i < newData.GetUpperBound(0); i++)
+        double[,] newData = new double[matrix.GetDimension()[0], matrix.GetDimension()[1]];
+        for (var i = 0; i < newData.GetUpperBound(0) + 1; i++)
         {
-            for (var j = 0; j < newData.GetUpperBound(1); j++)
+            for (var j = 0; j < newData.GetUpperBound(1) + 1; j++)
             {
                 newData[i, j] = matrix.Data[i, j];
             }
@@ -34,19 +38,72 @@ class Matrix
     public Matrix(double[,] data)
     {
         Data = data;
+        _dimension[0] = (uint)Data.GetUpperBound(0) + 1;
+        _dimension[1] = (uint)Data.GetUpperBound(1) + 1;
     }
-    public static Matrix operator+(Matrix matrixA, Matrix matrixB)
+
+    public static Matrix GetRandomMatrix(uint n, uint m)
     {
-        if (matrixA.Dimension(0) != matrixB.Dimension(0) || matrixA.Dimension(1) != matrixB.Dimension(1))
+        
+        //var new_matrix = new Matrix(n, m);
+        var data = new double[n, m];
+        Random rnd = new Random();
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                data[i, j] = rnd.Next() % 256;
+                //Console.WriteLine($"New value is {data[i, j]}");
+            }
+        }
+        var new_matrix = new Matrix(data);
+        return new_matrix;
+    }
+
+    // 2. Матричные операции
+    public Matrix ParallelSum(Matrix another)
+    {
+        /* 
+        Метод параллельного сложения двух матриц
+        */
+
+        // исключение в случае несовпадения размерностей матриц
+        if (another.GetDimension()[0] != GetDimension()[0] || another.GetDimension()[1] != GetDimension()[1])
         {
             throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
         }
 
-        var matrixC = new Matrix(matrixA.Dimension(0), matrixB.Dimension(1));
+        // результирующая матрица
+        var res_matrix = new Matrix(another.GetDimension()[0], another.GetDimension()[1]);
 
-        for (var i = 0; i < matrixA.Dimension(0); i++)
+        // параллелим для каждой строчки
+        Parallel.For(0, another.GetDimension()[0], i =>
         {
-            for (var j = 0; j < matrixB.Dimension(1); j++)
+            for (int j = 0; j < another.GetDimension()[1]; j++){
+                res_matrix.Data[i, j] = another.Data[i, j] + Data[i, j];
+            }
+        });
+
+        return res_matrix;
+    }
+
+    public static Matrix operator+(Matrix matrixA, Matrix matrixB)
+    {
+        /* 
+        Перегрузка оператора сложения для двух матриц
+        */
+
+        // исключение в случае несовпадения размерностей матриц
+        if (matrixA.GetDimension()[0] != matrixB.GetDimension()[0] || matrixA.GetDimension()[1] != matrixB.GetDimension()[1])
+        {
+            throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
+        }
+
+        var matrixC = new Matrix(matrixA.GetDimension()[0], matrixB.GetDimension()[1]);
+
+        for (var i = 0; i < matrixA.GetDimension()[0]; i++)
+        {
+            for (var j = 0; j < matrixB.GetDimension()[1]; j++)
             {
                 matrixC.Data[i, j] = matrixA.Data[i, j] + matrixB.Data[i, j];
             }
@@ -55,22 +112,57 @@ class Matrix
         return matrixC;
     }
 
-    public static Matrix operator *(Matrix matrixA, Matrix matrixB)
+    public Matrix ParallelProduct(Matrix another)
     {
-        if (matrixA.Dimension(1) != matrixB.Dimension(0))
+        /* 
+        Метод параллельного умножения двух матриц
+        */
+
+        if (GetDimension()[1] != another.GetDimension()[0])
         {
             throw new Exception("Умножение не возможно! Количество столбцов первой матрицы не равно количеству строк второй матрицы.");
         }
 
-        var matrixC = new Matrix(matrixA.Dimension(0), matrixB.Dimension(1));
+        var matrixC = new Matrix(GetDimension()[0], another.GetDimension()[1]);
 
-        for (var i = 0; i < matrixA.Dimension(0); i++)
+
+        Parallel.For(0, GetDimension()[0], i =>
         {
-            for (var j = 0; j < matrixB.Dimension(1); j++)
+            for (var j = 0; j < another.GetDimension()[1]; j++)
+            {
+                //matrixC.Data[i, j] = 0;
+                for (var k = 0; k < GetDimension()[1]; k++)
+                {
+                    matrixC.Data[i, j] += Data[i, k] * another.Data[k, j];
+                }
+            }
+        });
+
+
+
+        return matrixC;
+    }
+
+    public static Matrix operator *(Matrix matrixA, Matrix matrixB)
+    {
+        /* 
+        Перегрузка оператора умножения для двух матриц
+        */
+
+        if (matrixA.GetDimension()[1] != matrixB.GetDimension()[0])
+        {
+            throw new Exception("Умножение не возможно! Количество столбцов первой матрицы не равно количеству строк второй матрицы.");
+        }
+
+        var matrixC = new Matrix(matrixA.GetDimension()[0], matrixB.GetDimension()[1]);
+
+        for (var i = 0; i < matrixA.GetDimension()[0]; i++)
+        {
+            for (var j = 0; j < matrixB.GetDimension()[1]; j++)
             {
                 matrixC.Data[i, j] = 0;
 
-                for (var k = 0; k < matrixA.Dimension(1); k++)
+                for (var k = 0; k < matrixA.GetDimension()[1]; k++)
                 {
                     matrixC.Data[i, j] += matrixA.Data[i, k] * matrixB.Data[k, j];
                 }
@@ -82,31 +174,121 @@ class Matrix
 
     public static Matrix E(uint n, uint m)
     {
+        /*
+        Метод, возвращающий единичную матрицу заданной размерности
+        */
         Matrix res = new Matrix(n, m);
-        for (var i = 0; i < res.Dimension(0); i++)
+        for (var i = 0; i < res.GetDimension()[0]; i++)
         {
-            for (var j = 0; j < res.Dimension(1); j++)
+            for (var j = 0; j < res.GetDimension()[1]; j++)
             {
-                res.Data[i, j] = 1;
+                if (i == j)
+                {
+                    res.Data[i, j] = 1;
+                }
             }
         }
         return res;
     }
+    
+    public Matrix T()
+    {
+        Matrix res_matrix = new Matrix(GetDimension()[0], GetDimension()[1]);
+
+        for (int i = 0; i < res_matrix.GetDimension()[0]; i++)
+        {
+            for (int j = 0; j < res_matrix.GetDimension()[1]; j++)
+            {
+                res_matrix.Data[i, j] = Data[j, i];
+            }
+        }
+        return res_matrix;
+    }
+    
     public static Matrix operator^(Matrix matrix, uint n)
     {
         if (n == 0) {
-            return E(matrix.Dimension(0), matrix.Dimension(1));
+            return E(matrix.GetDimension()[0], matrix.GetDimension()[1]);
         }
+
         var res = new Matrix(matrix);
 
         for (var i = 0; i < n - 1; i++)
         {
             res = res * matrix;
         }
-
         return res;
     }
+
+    public Matrix ParallelPow(uint n)
+    {
+        /*
+        Параллельное умножение матриц 
+        */
+        if (n == 0) {
+            return E(GetDimension()[0], GetDimension()[1]);
+        }
+
+        var res = new Matrix(this);
+
+        for (var i = 0; i < n - 1; i++)
+        {
+            res = res.ParallelProduct(this);
+        }
+        return res;
+    }
+
+    public Matrix ParallelPowBin(uint n)
+    {
+        /*
+        Считаем матрицы во всем степенях двойки, не превосходящие максимальной степени лвойки в двоичном 
+        разложении. После чего происходит параллельное умножение полученных матриц.
+        */
+        if (n == 0) {
+            return E(GetDimension()[0], GetDimension()[1]);
+        }
+
+        var res = new Matrix(this);
+        string stack1 = Convert.ToString(n, 2);
+        Matrix[] cache = new Matrix[stack1.Length];
+        Console.WriteLine(stack1.Substring(2,2));
+        
+        for (int i = 0; i < stack1.Length; i++){
+            if (i == 0)
+            {
+                cache[i] = res;
+            }
+            else
+            {
+                cache[i] = cache[i - 1].ParallelProduct(cache[i - 1]);
+            }
+        }
+
+        bool check = false;
+        for (int j = 0; j < stack1.Length; j++)
+        {
+            if (stack1.Substring(stack1.Length - j - 1, 1) == "1")
+            {
+                if (check)
+                {
+                    res = res.ParallelProduct(cache[j]);
+                }
+                else
+                {
+                    res = cache[j];
+                    check = true;
+                }
+                
+            }
+        }
+        
+        return res;
+    }
+
+    // 3. Линейные преобразования
+    //TODO: умножение на число всей матрицы
 }
+
 
 class Program
 {
@@ -134,9 +316,9 @@ class Program
     // метод для печати матрицы в консоль
     static void PrintMatrix(Matrix matrix)
     {
-        for (var i = 0; i < matrix.Dimension(0); i++)
+        for (var i = 0; i < matrix.GetDimension()[0]; i++)
         {
-            for (var j = 0; j < matrix.Dimension(1); j++)
+            for (var j = 0; j < matrix.GetDimension()[1]; j++)
             {
                 Console.Write(matrix.Data[i, j].ToString().PadLeft(10));
             }
@@ -147,24 +329,90 @@ class Program
 
     static void Main(string[] args)
     {
+        bool checkProduct = false;
+        bool checkSum = false;
+        bool checkPow = true;
+        bool checkTranspose = false;
+
         Console.WriteLine("Программа для умножения матриц");
 
-        var a = GetMatrixFromConsole("A");
-        var b = GetMatrixFromConsole("B");
+        //var a = GetMatrixFromConsole("A");
+        //var b = GetMatrixFromConsole("B");
 
-        Console.WriteLine("Матрица A:");
-        Matrix matrixA = new Matrix(a);
-        PrintMatrix(matrixA);
+        Matrix matrixB = Matrix.GetRandomMatrix(200, 200);
+        Matrix matrixA = Matrix.GetRandomMatrix(200, 200);
 
-        Console.WriteLine("Матрица B:");
-        Matrix matrixB = new Matrix(b);
-        PrintMatrix(matrixB);
 
-        uint pow = 0;
-        var result = matrixA + matrixB;
-        Console.WriteLine("Возведение матрицы в степень {0}:", pow);
-        PrintMatrix(result);
+        //Matrix elem = new Matrix(a);
+        
+        if (checkProduct)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var result = matrixA.ParallelProduct(matrixB);
+            sw.Stop();
+            Console.WriteLine($"Параллельное умножение матриц: {sw.Elapsed}");
 
-        Console.ReadLine();
+            sw.Reset();
+            sw.Start();
+            result = matrixA * matrixB;
+            sw.Stop();
+            Console.WriteLine($"Обычное умножение матриц: {sw.Elapsed}");
+            //PrintMatrix(result);
+
+            //Console.ReadLine();
+        }
+
+        if (checkSum)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var result = matrixA.ParallelSum(matrixB);
+            sw.Stop();
+            Console.WriteLine($"Параллельное сложение матриц: {sw.Elapsed}");
+
+            sw.Reset();
+            sw.Start();
+            result = matrixA + matrixB;
+            sw.Stop();
+            Console.WriteLine($"Обычное сложение матриц: {sw.Elapsed}");
+            //PrintMatrix(result);
+
+            //Console.ReadLine();
+        }
+
+        if (checkPow)
+        {
+            uint power = 12;
+            var sw = new Stopwatch();
+            Console.WriteLine("До возведение матриц в степень: ");
+            //PrintMatrix(matrixA);
+            sw.Start();
+            var result1 = matrixA.ParallelPowBin(power);
+            sw.Stop();
+            Console.WriteLine($"Параллельное возведение матриц в степень: {sw.Elapsed}");
+            //PrintMatrix(result1);
+
+            var result3 = matrixA^power;
+
+            sw.Reset();
+            sw.Start();
+            var result2 = matrixA^power;
+            sw.Stop();
+            Console.WriteLine($"Обычное возведение матриц в степень: {sw.Elapsed}");
+            //PrintMatrix(result1);
+
+
+        }
+
+        if (checkTranspose)
+        {
+            Matrix before_transpose = Matrix.GetRandomMatrix(3, 3);
+            Console.WriteLine("Матрица до транспонирования: ");
+            PrintMatrix(before_transpose);
+            Matrix after_transpose = before_transpose.T();
+            Console.WriteLine("Матрица до транспонирования: ");
+            PrintMatrix(after_transpose);
+        }
     }
 }
