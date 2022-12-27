@@ -1,9 +1,10 @@
 using System;
-using System.Threading;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-
-// класс с методами расширения
 class Matrix
 {
     public double[,] Data;
@@ -87,6 +88,46 @@ class Matrix
         return res_matrix;
     }
 
+    void WorkSum(int i, ref Matrix res_matrix, ref Matrix another)
+    {
+        for (int j = 0; j < another.GetDimension()[1]; j++)
+        {
+            res_matrix.Data[i, j] = another.Data[i, j] + Data[i, j];
+        }
+    }
+    public Matrix ParallelSumThreadPool(Matrix another, InstanceThreadPool thread_pool)
+    {
+        /* 
+        Метод параллельного сложения двух матриц
+        */
+
+        // исключение в случае несовпадения размерностей матриц
+        if (another.GetDimension()[0] != GetDimension()[0] || another.GetDimension()[1] != GetDimension()[1])
+        {
+            throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
+        }
+
+        // результирующая матрица
+        var res_matrix = new Matrix(another.GetDimension()[0], another.GetDimension()[1]);
+
+        int a = 0;
+
+        // параллелим для каждой строчки
+        for (var i = 0; i < another.GetDimension()[0]; i++)
+        {
+            a++;
+            thread_pool.Execute(i, obj =>
+            {
+                WorkSum((int)obj, ref res_matrix, ref another);
+                a--;
+            });
+            
+        }
+        while (a > 0)
+            ;
+        return res_matrix;
+    }
+
     public static Matrix operator+(Matrix matrixA, Matrix matrixB)
     {
         /* 
@@ -125,7 +166,6 @@ class Matrix
 
         var matrixC = new Matrix(GetDimension()[0], another.GetDimension()[1]);
 
-
         Parallel.For(0, GetDimension()[0], i =>
         {
             for (var j = 0; j < another.GetDimension()[1]; j++)
@@ -140,6 +180,48 @@ class Matrix
 
 
 
+        return matrixC;
+    }
+
+    void WorkProduct(int i, ref Matrix matrixC, ref Matrix another)
+    {
+        for (var j = 0; j < another.GetDimension()[1]; j++)
+        {
+            //matrixC.Data[i, j] = 0;
+            for (var k = 0; k < GetDimension()[1]; k++)
+            {
+                matrixC.Data[i, j] += Data[i, k] * another.Data[k, j];
+            }
+        }
+    }
+
+    public Matrix ParallelProductThreadPool(Matrix another, InstanceThreadPool thread_pool)
+    {
+        /* 
+        Метод параллельного умножения двух матриц
+        */
+
+        if (GetDimension()[1] != another.GetDimension()[0])
+        {
+            throw new Exception("Умножение не возможно! Количество столбцов первой матрицы не равно количеству строк второй матрицы.");
+        }
+
+        var matrixC = new Matrix(GetDimension()[0], another.GetDimension()[1]);
+        int a = 0;
+        foreach (var i in Enumerable.Range(0, (int)GetDimension()[0]))
+        {
+            a++;
+            thread_pool.Execute(i, obj =>
+            {
+                WorkProduct((int)obj, ref matrixC, ref another);
+                a--;
+            });
+        }
+        while (a > 0)
+        {
+            Thread.Sleep(500);
+            Console.WriteLine("Mem");
+        }
         return matrixC;
     }
 
@@ -238,6 +320,25 @@ class Matrix
         return res;
     }
 
+    public Matrix ParallelPowThreadPool(uint n, InstanceThreadPool thread_pool)
+    {
+        /*
+        Параллельное умножение матриц 
+        */
+        if (n == 0)
+        {
+            return E(GetDimension()[0], GetDimension()[1]);
+        }
+
+        var res = new Matrix(this);
+
+        for (var i = 0; i < n - 1; i++)
+        {
+            res = res.ParallelProductThreadPool(this, thread_pool);
+        }
+        return res;
+    }
+
     public Matrix ParallelPowBin(uint n)
     {
         /*
@@ -251,8 +352,8 @@ class Matrix
         var res = new Matrix(this);
         string stack1 = Convert.ToString(n, 2);
         Matrix[] cache = new Matrix[stack1.Length];
-        Console.WriteLine(stack1.Substring(2,2));
-        
+        // Console.WriteLine(stack1.Substring(2,2));
+
         for (int i = 0; i < stack1.Length; i++){
             if (i == 0)
             {
@@ -330,20 +431,20 @@ class Program
     static void Main(string[] args)
     {
         bool checkProduct = false;
-        bool checkSum = false;
+        bool checkSum = true;
         bool checkPow = true;
         bool checkTranspose = false;
 
+        // It's a creating a ThreadPool
+        var thread_pool = new InstanceThreadPool(100, Name: "Обработчик матриц");
+        for (int i = 0;i < 100; i++)
+            thread_pool.Execute(i, obj => { /* nothing*/});
         Console.WriteLine("Программа для умножения матриц");
 
-        //var a = GetMatrixFromConsole("A");
-        //var b = GetMatrixFromConsole("B");
 
         Matrix matrixB = Matrix.GetRandomMatrix(200, 200);
         Matrix matrixA = Matrix.GetRandomMatrix(200, 200);
 
-
-        //Matrix elem = new Matrix(a);
         
         if (checkProduct)
         {
@@ -376,14 +477,17 @@ class Program
             result = matrixA + matrixB;
             sw.Stop();
             Console.WriteLine($"Обычное сложение матриц: {sw.Elapsed}");
-            //PrintMatrix(result);
-
-            //Console.ReadLine();
+            sw.Reset();
+            sw.Start();
+            // А теперь с ThreadPool
+            var result4 = matrixA.ParallelSumThreadPool(matrixB, thread_pool);
+            sw.Stop();
+            Console.WriteLine($"Параллельное сложение матриц c ThreadPool: {sw.Elapsed}");
         }
 
         if (checkPow)
         {
-            uint power = 12;
+            uint power = 5;
             var sw = new Stopwatch();
             Console.WriteLine("До возведение матриц в степень: ");
             //PrintMatrix(matrixA);
@@ -400,9 +504,12 @@ class Program
             var result2 = matrixA^power;
             sw.Stop();
             Console.WriteLine($"Обычное возведение матриц в степень: {sw.Elapsed}");
-            //PrintMatrix(result1);
-
-
+            sw.Reset();
+            sw.Start();
+            // А теперь с ThreadPool
+            var result4 = matrixA.ParallelPowThreadPool(power, thread_pool);
+            sw.Stop();
+            Console.WriteLine($"Параллельное возведение матриц в степень c ThreadPool: {sw.Elapsed}");
         }
 
         if (checkTranspose)
@@ -414,5 +521,10 @@ class Program
             Console.WriteLine("Матрица до транспонирования: ");
             PrintMatrix(after_transpose);
         }
+
+        
+        Console.ReadLine();
+        Console.WriteLine("And again");
+        Console.ReadLine();
     }
 }

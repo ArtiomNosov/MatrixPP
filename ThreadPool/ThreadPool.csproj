@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{869E948F-ADD9-43D6-8340-0662D5A3BE04}</ProjectGuid>
+    <ProjectGuid>{EB8641F4-7738-4639-B12A-7952E30CCC78}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MatrixPP</RootNamespace>
-    <AssemblyName>MatrixPP</AssemblyName>
+    <RootNamespace>ThreadPool</RootNamespace>
+    <AssemblyName>ThreadPool</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -44,17 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="InstanceThreadPool.cs" />
+    <Compile Include="ConsoleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ThreadPool\ThreadPool.csproj">
-      <Project>{eb8641f4-7738-4639-b12a-7952e30ccc78}</Project>
-      <Name>ThreadPool</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
