@@ -1,0 +1,40 @@
+Iteration: 0, sizes: (1000, 1000)
+Ordinary: 00:00:00.0089591
+Parallel: 00:00:00.0062927
+Parallel + ThreadPool: 00:00:00.0197092
+Iteration: 1, sizes: (1900, 1900)
+Ordinary: 00:00:00.0302689
+Parallel: 00:00:00.0082155
+Parallel + ThreadPool: 00:00:00.0397601
+Iteration: 2, sizes: (2800, 2800)
+Ordinary: 00:00:00.0640231
+Parallel: 00:00:00.0149425
+Parallel + ThreadPool: 00:00:00.0567592
+Iteration: 3, sizes: (3700, 3700)
+Ordinary: 00:00:00.1151916
+Parallel: 00:00:00.0247683
+Parallel + ThreadPool: 00:00:00.0859071
+Iteration: 4, sizes: (4600, 4600)
+Ordinary: 00:00:00.1877229
+Parallel: 00:00:00.0375062
+Parallel + ThreadPool: 00:00:00.0931209
+Iteration: 5, sizes: (5500, 5500)
+Ordinary: 00:00:00.2870620
+Parallel: 00:00:00.0699620
+Parallel + ThreadPool: 00:00:00.1183480
+Iteration: 6, sizes: (6400, 6400)
+Ordinary: 00:00:00.3857322
+Parallel: 00:00:00.0750432
+Parallel + ThreadPool: 00:00:00.1578087
+Iteration: 7, sizes: (7300, 7300)
+Ordinary: 00:00:00.4812672
+Parallel: 00:00:00.1086534
+Parallel + ThreadPool: 00:00:00.2000110
+Iteration: 8, sizes: (8200, 8200)
+Ordinary: 00:00:00.6585245
+Parallel: 00:00:00.1668741
+Parallel + ThreadPool: 00:00:00.2419763
+Iteration: 9, sizes: (9100, 9100)
+Ordinary: 00:00:00.7287893
+Parallel: 00:00:00.1908782
+Parallel + ThreadPool: 00:00:00.3071036

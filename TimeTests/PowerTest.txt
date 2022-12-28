@@ -1,0 +1,60 @@
+Iteration: 0, sizes: (100, 100)
+Ordinary: 00:00:00.0738781
+Parallel: 00:00:00.0283399
+Parallel + Cache: 00:00:00.0111260
+Parallel + ThreadPool: 00:00:00.0376250
+Parallel + Cache + ThreadPool: 00:00:00.0152379
+Iteration: 1, sizes: (190, 190)
+Ordinary: 00:00:00.5012406
+Parallel: 00:00:00.1253760
+Parallel + Cache: 00:00:00.0588130
+Parallel + ThreadPool: 00:00:00.1558606
+Parallel + Cache + ThreadPool: 00:00:00.0660477
+Iteration: 2, sizes: (280, 280)
+Ordinary: 00:00:01.5909220
+Parallel: 00:00:00.3668176
+Parallel + Cache: 00:00:00.1594734
+Parallel + ThreadPool: 00:00:00.4973468
+Parallel + Cache + ThreadPool: 00:00:00.2175216
+Iteration: 3, sizes: (370, 370)
+Ordinary: 00:00:03.6656690
+Parallel: 00:00:00.7958752
+Parallel + Cache: 00:00:00.3543283
+Parallel + ThreadPool: 00:00:01.1036615
+Parallel + Cache + ThreadPool: 00:00:00.5011795
+Iteration: 4, sizes: (460, 460)
+Ordinary: 00:00:07.0992921
+Parallel: 00:00:01.4691258
+Parallel + Cache: 00:00:00.6488245
+Parallel + ThreadPool: 00:00:02.1060263
+Parallel + Cache + ThreadPool: 00:00:00.9258068
+Iteration: 5, sizes: (550, 550)
+Ordinary: 00:00:12.1843303
+Parallel: 00:00:02.3402277
+Parallel + Cache: 00:00:01.1525789
+Parallel + ThreadPool: 00:00:03.7398567
+Parallel + Cache + ThreadPool: 00:00:01.5884592
+Iteration: 6, sizes: (640, 640)
+Ordinary: 00:00:19.9178065
+Parallel: 00:00:03.8006731
+Parallel + Cache: 00:00:01.8270099
+Parallel + ThreadPool: 00:00:05.9740727
+Parallel + Cache + ThreadPool: 00:00:02.6257824
+Iteration: 7, sizes: (730, 730)
+Ordinary: 00:00:28.6117792
+Parallel: 00:00:05.7703790
+Parallel + Cache: 00:00:02.3751033
+Parallel + ThreadPool: 00:00:08.3882595
+Parallel + Cache + ThreadPool: 00:00:03.7853878
+Iteration: 8, sizes: (820, 820)
+Ordinary: 00:00:41.1142654
+Parallel: 00:00:07.7653981
+Parallel + Cache: 00:00:03.5234798
+Parallel + ThreadPool: 00:00:11.9618932
+Parallel + Cache + ThreadPool: 00:00:05.3408799
+Iteration: 9, sizes: (910, 910)
+Ordinary: 00:00:55.8705547
+Parallel: 00:00:11.1028525
+Parallel + Cache: 00:00:04.6650891
+Parallel + ThreadPool: 00:00:16.3348582
+Parallel + Cache + ThreadPool: 00:00:07.2845399
