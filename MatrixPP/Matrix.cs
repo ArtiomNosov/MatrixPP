@@ -436,12 +436,8 @@ public Matrix ParallelPowBin(uint n)
         return res;
     }
 
-    
-
-    
 
     // 4. Линейные преобразования
-    //TODO: умножение на число всей матрицы
 
     public Matrix ParallelProduct(double number)
     {
