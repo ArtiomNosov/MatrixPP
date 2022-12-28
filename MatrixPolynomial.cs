@@ -12,38 +12,6 @@ class MatrixPolynomial
         this._data = coefficient;
     }
 
-    static void PrintMatrix(Matrix matrix)
-    {
-        Console.Write("[");
-        for (var i = 0; i < matrix.GetDimension()[0]; i++)
-        {
-            if (i != 0)
-            {
-                Console.Write(" ");
-            }
-            Console.Write("[");
-            for (var j = 0; j < matrix.GetDimension()[1]; j++)
-            {
-                Console.Write(matrix.Data[i, j].ToString().PadLeft(10));
-                if (j + 1 < matrix.GetDimension()[1])
-                {
-                    Console.Write(",");
-                }
-            }
-            Console.Write("]");
-            if (i + 1 == matrix.GetDimension()[0])
-            {
-                Console.Write("]");
-            }
-            else
-            {
-                Console.Write(",");
-            }
-            Console.WriteLine();
-        }
-    }
-
-
     public Matrix Calculate(Matrix matrix)
     {
         if (matrix.GetDimension()[0] != matrix.GetDimension()[1])
