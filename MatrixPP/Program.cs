@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Diagnostics;
 
@@ -54,10 +54,11 @@ class Program
     static void Main(string[] args)
     {
         bool checkSum = false;
-        bool checkProduct = true;
+        bool checkProduct = false;
         bool checkPow = false;
         bool checkTranspose = false;
         bool timeTest = false;
+        bool checkMP = true;
 
         Console.WriteLine("Программа для умножения матриц");
 
@@ -72,15 +73,27 @@ class Program
 
         //Matrix elem = new Matrix(a);
         
+        if (checkMP)
+        {
+            double[] coefficienst = new double[] {1, 1, 1};
+            Matrix matrix = Matrix.E(3, 3);
+            MatrixPolynomial mp = new MatrixPolynomial(coefficienst);
+            Matrix res = mp.Calculate(matrix);
+            PrintMatrix(res);
+        }
+
         if (timeTest)
         {
             
             uint[] from = new uint[] {100, 100};
             uint[] to = new uint[] {1000, 1000};
             uint count = 10;
-            TimeTest.Sum(count, from, to);
-            TimeTest.Product(count, from, to);
-            TimeTest.Power(count, from, to, 10);
+            //TimeTest.SumForAll(count, from, to);
+            //TimeTest.ProductForAll(count, from, to);
+            //TimeTest.PowerForAll(count, from, to, 10);
+            //TimeTest.SumForParallels(count, from, to);
+            //TimeTest.ProductForParallel(count, from, to);
+            TimeTest.PowerForParallel(count, from, to, 10);
         }
 
         if (checkProduct)
