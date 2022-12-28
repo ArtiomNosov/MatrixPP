@@ -173,16 +173,22 @@ class Matrix
         // результирующая матрица
         var res_matrix = new Matrix(another.GetDimension()[0], another.GetDimension()[1]);
 
+
         // параллелим для каждой строчки
-        for (var i = 0; i < another.GetDimension()[0]; i++)
+        for (int i = 0; i < another.GetDimension()[0]; i++)
         {
             thread_pool.Execute(i, obj =>
             {
                 WorkSum((int)obj, ref res_matrix, ref another);
+                //Console.WriteLine((int)obj);
             });
             
         }
-        while (thread_pool.GetWorkCount() > 0);
+        while (thread_pool.GetWorkCount() > 0 || thread_pool.HasThreadsAlive()) {
+            //Thread.Sleep(100);
+            //thread_pool.HasThreadsAlive();
+            //Console.WriteLine(thread_pool);
+        };
         return res_matrix;
     }
 
@@ -272,23 +278,23 @@ class Matrix
         }
 
         var matrixC = new Matrix(GetDimension()[0], another.GetDimension()[1]);
-        foreach (var i in Enumerable.Range(0, (int)GetDimension()[0]))
+        
+        for (var i = 0; i < another.GetDimension()[0]; i++)
         {
             thread_pool.Execute(i, obj =>
             {
+                
                 WorkProduct((int)obj, ref matrixC, ref another);
             });
+            
         }
-        while (thread_pool.GetWorkCount() > 0){
-            //Console.WriteLine(thread_pool.GetWorkCount());
-        }
-        ;
+        while (thread_pool.GetWorkCount() > 0 || thread_pool.HasThreadsAlive()){};
         return matrixC;
     }
 
     
     //3.3 Возведение матрицы в степень (наиболее важный метод для матричных полиномов)
-    public static Matrix operator^(Matrix matrix, uint n)
+    public static Matrix operator^(Matrix matrix, int n)
     {
         /*
         Метод непараллельного возведения матрицы в степень
@@ -307,7 +313,7 @@ class Matrix
         return res;
     }
 
-    public Matrix ParallelPow(uint n)
+    public Matrix ParallelPow(int n)
     {
         /*
         Параллельное умножение матриц 
@@ -325,7 +331,7 @@ class Matrix
         return res;
     }
 
-    public Matrix ParallelPowThreadPool(uint n, InstanceThreadPool thread_pool)
+    public Matrix ParallelPowThreadPool(int n, InstanceThreadPool thread_pool)
     {
         /*
         Параллельное умножение матриц с использованием кастомного threadpool
@@ -343,7 +349,7 @@ class Matrix
         return res;
     }
 
-public Matrix ParallelPowBin(uint n)
+public Matrix ParallelPowBin(int n)
     {
         /*
         Считаем матрицы во всем степенях двойки, не превосходящие максимальной степени лвойки в двоичном 
@@ -390,7 +396,7 @@ public Matrix ParallelPowBin(uint n)
         return res;
     }
 
-    public Matrix ParallelPowBinThreadPool(uint n, InstanceThreadPool thread_pool)
+    public Matrix ParallelPowBinThreadPool(int n, InstanceThreadPool thread_pool)
     {
         /*
         Считаем матрицы во всем степенях двойки, не превосходящие максимальной степени лвойки в двоичном 
