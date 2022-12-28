@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 // ReSharper disable once CheckNamespace
-using System.Threading;
+namespace System.Threading;
 
 public class InstanceThreadPool : IDisposable
 {
     private readonly ThreadPriority _Prioroty;
     private readonly string _Name;
     private readonly Thread[] _Threads;
-    private readonly Queue<(Action<object> Work, object Parameter)> _Works = new Queue<(Action<object> Work, object Parameter)>();
+    private readonly Queue<(Action<object?> Work, object? Parameter)> _Works = new();
     private volatile bool _CanWork = true;
 
-    private readonly AutoResetEvent _WorkingEvent = new AutoResetEvent(false);
-    private readonly AutoResetEvent _ExecuteEvent = new AutoResetEvent(true);
+    private readonly AutoResetEvent _WorkingEvent = new(false);
+    private readonly AutoResetEvent _ExecuteEvent = new(true);
 
     public string Name => _Name;
 
-    public InstanceThreadPool(int MaxThreadsCount, ThreadPriority Prioroty = ThreadPriority.Normal, string Name = null)
+    public InstanceThreadPool(int MaxThreadsCount, ThreadPriority Prioroty = ThreadPriority.Normal, string? Name = null)
     {
         if (MaxThreadsCount <= 0)
             throw new ArgumentOutOfRangeException(nameof(MaxThreadsCount), MaxThreadsCount, "Число потоков в пуле должно быть больше, либо равно 1");
@@ -49,7 +47,7 @@ public class InstanceThreadPool : IDisposable
 
     public void Execute(Action Work) => Execute(null, _ => Work());
 
-    public void Execute(object Parameter, Action<object> Work)
+    public void Execute(object? Parameter, Action<object?> Work)
     {
         if (!_CanWork) throw new InvalidOperationException("Попытка передать задание уничтоженному пулу потоков");
 
@@ -111,6 +109,7 @@ public class InstanceThreadPool : IDisposable
                     Trace.TraceError("Ошибка выполнения задания в потоке {0}:{1}", thread_name, e);
                 }
             }
+            
         }
         catch (ThreadInterruptedException)
         {
@@ -124,6 +123,11 @@ public class InstanceThreadPool : IDisposable
             if (!_WorkingEvent.SafeWaitHandle.IsClosed)
                 _WorkingEvent.Set();
         }
+    }
+
+    public int GetWorkCount()
+    {
+        return _Works.Count;
     }
 
     private const int _DisposeThreadJoinTimeout = 100;
