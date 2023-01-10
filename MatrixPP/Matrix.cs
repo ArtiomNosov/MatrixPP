@@ -1,4 +1,8 @@
-class Matrix
+
+using System;
+using System.Threading.Tasks;
+
+public class Matrix
 {
     /*
     Класс матрицы с различными видами вычислений: последовательным и параллельным
@@ -41,7 +45,7 @@ class Matrix
         
         //var new_matrix = new Matrix(n, m);
         var data = new double[n, m];
-        Random rnd = new Random();
+        System.Random rnd = new Random();
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < m; j++)
@@ -136,11 +140,12 @@ class Matrix
         {
             throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
         }
-
+        
         // результирующая матрица
         var res_matrix = new Matrix(another.GetDimension()[0], another.GetDimension()[1]);
 
         // параллелим для каждой строчки
+
         Parallel.For(0, another.GetDimension()[0], i =>
         {
             for (int j = 0; j < another.GetDimension()[1]; j++){
@@ -180,14 +185,11 @@ class Matrix
             thread_pool.Execute(i, obj =>
             {
                 WorkSum((int)obj, ref res_matrix, ref another);
-                //Console.WriteLine((int)obj);
             });
             
         }
-        while (thread_pool.GetWorkCount() > 0 || thread_pool.HasThreadsAlive()) {
-            //Thread.Sleep(100);
-            //thread_pool.HasThreadsAlive();
-            //Console.WriteLine(thread_pool);
+        while (thread_pool.GetWorkCount() > 0) {
+
         };
         return res_matrix;
     }
@@ -243,7 +245,6 @@ class Matrix
         {
             for (var j = 0; j < another.GetDimension()[1]; j++)
             {
-                //matrixC.Data[i, j] = 0;
                 for (var k = 0; k < GetDimension()[1]; k++)
                 {
                     matrixC.Data[i, j] += Data[i, k] * another.Data[k, j];
@@ -258,7 +259,6 @@ class Matrix
     {
         for (var j = 0; j < another.GetDimension()[1]; j++)
         {
-            //matrixC.Data[i, j] = 0;
             for (var k = 0; k < GetDimension()[1]; k++)
             {
                 matrixC.Data[i, j] += Data[i, k] * another.Data[k, j];
@@ -288,7 +288,7 @@ class Matrix
             });
             
         }
-        while (thread_pool.GetWorkCount() > 0 || thread_pool.HasThreadsAlive()){};
+        while (thread_pool.GetWorkCount() > 0){};
         return matrixC;
     }
 

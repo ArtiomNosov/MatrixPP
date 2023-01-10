@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Menu
 {
@@ -17,16 +12,16 @@ namespace Menu
         static string[] MainMenu =
         {
             "Q - выход из программы",
-            "1 - сгенерировать случайные матрицы"
+            "1 - сгенерировать случайные матрицы",
+            "2 - сложить две матрицы",
+            "3 - умножить две матрицы",
+            "4 - возвести матрицу в степень",
+            "5 - транспонировать мтарицу"
         };
         static void PrintArray<T>(T[] array)
         {
             foreach (var item in array)
                 Console.WriteLine(item);
-        }
-        void GenerateMatrix(ref Matrix)
-        {
-
         }
         static void Main(string[] args)
         {
@@ -35,6 +30,7 @@ namespace Menu
             {
                 PrintArray(MainMenu);
                 ConsoleKey consoleKey = Console.ReadKey().Key;
+                Console.WriteLine("\n");
                 switch (consoleKey)
                 {
                     case ConsoleKey.Backspace:
@@ -166,7 +162,7 @@ namespace Menu
                     case ConsoleKey.NumPad0:
                         break;
                     case ConsoleKey.NumPad1:
-                        GenerateMatrix();
+                        
                         break;
                     case ConsoleKey.NumPad2:
                         break;

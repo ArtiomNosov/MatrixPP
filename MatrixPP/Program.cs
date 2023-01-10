@@ -9,29 +9,6 @@ using System.Diagnostics;
 
 class Program
 {
-    
-    // метод для получения матрицы из консоли
-    static double[,] GetMatrixFromConsole(string name)
-    {
-        Console.Write("Количество строк матрицы {0}:    ", name);
-        var n = int.Parse(Console.ReadLine() + "");
-        Console.Write("Количество столбцов матрицы {0}: ", name);
-        var m = int.Parse(Console.ReadLine() + "");
-
-        var matrix = new double[n, m];
-        for (var i = 0; i < n; i++)
-        {
-            for (var j = 0; j < m; j++)
-            {
-                Console.Write("{0}[{1},{2}] = ", name, i, j);
-                matrix[i, j] = double.Parse(Console.ReadLine() + "");
-            }
-        }
-
-        return matrix;
-    }
-
-    // метод для печати матрицы в консоль
     static void PrintMatrix(Matrix matrix)
     {
         for (var i = 0; i < matrix.GetDimension()[0]; i++)
@@ -157,7 +134,7 @@ class Program
         {
             InstanceThreadPool thread_pool = new InstanceThreadPool(4, Name: "Обработчик матриц");
 
-            uint power = 10;
+            int power = 10;
             var sw = new Stopwatch();
 
             sw.Reset();

@@ -1,22 +1,23 @@
 using System.Diagnostics;
+using System;
 
 // ReSharper disable once CheckNamespace
-namespace System.Threading;
+using System.Threading;
 
 public class InstanceThreadPool : IDisposable
 {
     private readonly ThreadPriority _Prioroty;
     private readonly string _Name;
     private readonly Thread[] _Threads;
-    private readonly Queue<(Action<object?> Work, object? Parameter)> _Works = new();
+    private readonly System.Collections.Generic.Queue<(System.Action<object> Work, object Parameter)> _Works = new System.Collections.Generic.Queue<(Action<object> Work, object Parameter)>();
     private volatile bool _CanWork = true;
 
-    private readonly AutoResetEvent _WorkingEvent = new(false);
-    private readonly AutoResetEvent _ExecuteEvent = new(true);
+    private readonly AutoResetEvent _WorkingEvent = new AutoResetEvent(false);
+    private readonly AutoResetEvent _ExecuteEvent = new AutoResetEvent(true);
 
     public string Name => _Name;
 
-    public InstanceThreadPool(int MaxThreadsCount, ThreadPriority Prioroty = ThreadPriority.Normal, string? Name = null)
+    public InstanceThreadPool(int MaxThreadsCount, ThreadPriority Prioroty = ThreadPriority.Normal, string Name = null)
     {
         if (MaxThreadsCount <= 0)
             throw new ArgumentOutOfRangeException(nameof(MaxThreadsCount), MaxThreadsCount, "Число потоков в пуле должно быть больше, либо равно 1");
@@ -47,7 +48,7 @@ public class InstanceThreadPool : IDisposable
 
     public void Execute(Action Work) => Execute(null, _ => Work());
 
-    public void Execute(object? Parameter, Action<object?> Work)
+    public void Execute(object Parameter, Action<object> Work)
     {
         if (!_CanWork) throw new InvalidOperationException("Попытка передать задание уничтоженному пулу потоков");
 
