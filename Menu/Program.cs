@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Menu
 {
@@ -34,8 +35,16 @@ namespace Menu
             "2 - сложить две матрицы",
             "3 - умножить две матрицы",
             "4 - возвести матрицу в степень",
-            "5 - транспонировать мтарицу",
-            "6 - посчитать матричный полином с коэффициентам (1, 1, 1)"
+            "5 - транспонировать матрицу",
+            "6 - посчитать матричный полином с коэффициентам (1, 1, 1)", 
+            "f1 - сложить две матрицы параллельно",
+            "f2 - умножить две матрицы параллельно",
+            "f3 - возвести матрицу в степень параллельно",
+            "f4 - возвести матрицу в степень параллельно бинарным методом",
+            "f5 - сложить две матрицы параллельно с тредпулом",
+            "f6 - умножить две матрицы параллельно с тредпулом",
+            "f7 - возвести матрицу в степень параллельно с тредпулом",
+            "f8 - возвести матрицу в степень параллельно бинарным методом с тредпулом"
         };
         static void PrintArray<T>(T[] array)
         {
@@ -44,12 +53,19 @@ namespace Menu
         }
         static void Main()
         {
-            uint dim = 0;
-            Matrix matrixB = new Matrix(0, 0);
-            Matrix matrixA = new Matrix(0, 0);
+            int pow = 0;
             MenuStatus menuStatus = MenuStatus.Start;
+            Console.WriteLine("Введите размерность квадратных матриц А и B: ");
+            uint dim = uint.Parse(Console.ReadLine());
+            Matrix matrixB = Matrix.GetRandomMatrix(dim, dim), matrixA = Matrix.GetRandomMatrix(dim, dim), result = Matrix.E(dim, dim);
+            Console.WriteLine("Матрица А:\n");
+            PrintMatrix(matrixA);
+            Console.WriteLine("Матрица B:\n");
+            PrintMatrix(matrixB);
+            var sw = new Stopwatch();
             while (menuStatus == MenuStatus.Start)
             {
+                sw.Reset();
                 PrintArray(MainMenu);
                 ConsoleKey consoleKey = Console.ReadKey().Key;
                 Console.WriteLine("\n");
@@ -188,20 +204,38 @@ namespace Menu
                         matrixB = Matrix.GetRandomMatrix(dim, dim);
                         break;
                     case ConsoleKey.NumPad2:
+                        sw.Start();
+                        result = matrixA + matrixB;
+                        sw.Stop();
                         break;
                     case ConsoleKey.NumPad3:
+                        sw.Start();
+                        result = matrixA * matrixB;
+                        sw.Stop();
                         break;
                     case ConsoleKey.NumPad4:
+                        Console.WriteLine("Введите степень в которую нужно возвести матрицу А: ");
+                        pow = int.Parse(Console.ReadLine());
+                        sw.Start();
+                        result = matrixA^pow;
+                        sw.Stop();
+                        Console.WriteLine("Посчитан результат возведения матрицы А в степень " + pow);
                         break;
                     case ConsoleKey.NumPad5:
+                        sw.Start();
+                        result = matrixA.T();
+                        sw.Stop();
+                        Console.WriteLine("Посчитан результат транспонирования матрицы А " + pow);
                         break;
                     case ConsoleKey.NumPad6:
-                        break;
-                    case ConsoleKey.NumPad7:
                         double[] coefficienst = new double[] { 1, 1, 1 };
                         MatrixPolynomial mp = new MatrixPolynomial(coefficienst);
-                        Matrix res = mp.Calculate(matrixA);
-                        PrintMatrix(res);
+                        sw.Start();
+                        result = mp.Calculate(matrixA);
+                        sw.Stop();
+                        Console.WriteLine("Посчитан результат матричного полинома А " + pow);
+                        break;
+                    case ConsoleKey.NumPad7:
                         break;
                     case ConsoleKey.NumPad8:
                         break;
@@ -220,20 +254,44 @@ namespace Menu
                     case ConsoleKey.Divide:
                         break;
                     case ConsoleKey.F1:
+                        sw.Start();
+                        result = matrixA.ParallelSum(matrixB);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F2:
+                        sw.Start();
+                        result = matrixA.ParallelProduct(matrixB);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F3:
+                        sw.Start();
+                        result = matrixA.ParallelPow(pow);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F4:
+                        sw.Start();
+                        result = matrixA.ParallelPowBin(pow);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F5:
+                        sw.Start();
+                        result = matrixA.ParallelSumThreadPool(matrixB);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F6:
+                        sw.Start();
+                        result = matrixA.ParallelProductThreadPool(matrixB);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F7:
+                        sw.Start();
+                        result = matrixA.ParallelPowThreadPool(pow);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F8:
+                        sw.Start();
+                        result = matrixA.ParallelPowBinThreadPool(pow);
+                        sw.Stop();
                         break;
                     case ConsoleKey.F9:
                         break;
@@ -354,6 +412,9 @@ namespace Menu
                     default:
                         break;
                 }
+                Console.WriteLine("Result: \n");
+                PrintMatrix(result);
+                Console.WriteLine($"Затраченное на операцию время: {sw.Elapsed}");
             }
             Console.ReadLine();
         }
