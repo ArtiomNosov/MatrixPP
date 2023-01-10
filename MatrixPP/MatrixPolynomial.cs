@@ -1,6 +1,6 @@
 using System;
 
-class MatrixPolynomial
+public class MatrixPolynomial
 {
     /*
     Класс Матричный полином

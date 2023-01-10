@@ -11,6 +11,10 @@ public class Matrix
     public double[,] Data;
     private static uint[] _dimension = new uint[2];
 
+    private static InstanceThreadPool getInstanceThreadPool()
+    {
+        return new InstanceThreadPool(4, Name: "Обработчик матриц");
+    }
 
     // 1. Конструкторы матриц
     public Matrix(uint n, uint m)
@@ -149,11 +153,13 @@ public class Matrix
             res_matrix.Data[i, j] = another.Data[i, j] + Data[i, j];
         }
     }
-    public Matrix ParallelSumThreadPool(Matrix another, InstanceThreadPool thread_pool)
+    public Matrix ParallelSumThreadPool(Matrix another)
     {
         /* 
         Метод параллельного сложения двух матриц с использованием кастомного threadpool
         */
+
+        InstanceThreadPool thread_pool = getInstanceThreadPool();
 
         if (another.GetDimension()[0] != GetDimension()[0] || another.GetDimension()[1] != GetDimension()[1])
         {
@@ -244,8 +250,9 @@ public class Matrix
         }
     }
 
-    public Matrix ParallelProductThreadPool(Matrix another, InstanceThreadPool thread_pool)
+    public Matrix ParallelProductThreadPool(Matrix another)
     {
+        InstanceThreadPool thread_pool = getInstanceThreadPool();
 
         if (GetDimension()[1] != another.GetDimension()[0])
         {
@@ -300,8 +307,9 @@ public class Matrix
         return res;
     }
 
-    public Matrix ParallelPowThreadPool(int n, InstanceThreadPool thread_pool)
+    public Matrix ParallelPowThreadPool(int n)
     {
+        InstanceThreadPool thread_pool = getInstanceThreadPool();
         if (n == 0) {
             return E(GetDimension()[0], GetDimension()[1]);
         }
@@ -310,7 +318,7 @@ public class Matrix
 
         for (var i = 0; i < n - 1; i++)
         {
-            res = res.ParallelProductThreadPool(this, thread_pool);
+            res = res.ParallelProductThreadPool(this);
         }
         return res;
     }
@@ -362,12 +370,15 @@ public Matrix ParallelPowBin(int n)
         return res;
     }
 
-    public Matrix ParallelPowBinThreadPool(int n, InstanceThreadPool thread_pool)
+    public Matrix ParallelPowBinThreadPool(int n)
     {
         /*
         Считаем матрицы во всем степенях двойки, не превосходящие максимальной степени лвойки в двоичном 
         разложении. После чего происходит параллельное умножение полученных матриц.
         */
+
+        InstanceThreadPool thread_pool = getInstanceThreadPool();
+
         if (n == 0) {
             return E(GetDimension()[0], GetDimension()[1]);
         }
@@ -383,7 +394,7 @@ public Matrix ParallelPowBin(int n)
             }
             else
             {
-                cache[i] = cache[i - 1].ParallelProductThreadPool(cache[i - 1], thread_pool);
+                cache[i] = cache[i - 1].ParallelProductThreadPool(cache[i - 1]);
             }
         }
 
@@ -394,7 +405,7 @@ public Matrix ParallelPowBin(int n)
             {
                 if (check)
                 {
-                    res = res.ParallelProductThreadPool(cache[j], thread_pool);
+                    res = res.ParallelProductThreadPool(cache[j]);
                 }
                 else
                 {

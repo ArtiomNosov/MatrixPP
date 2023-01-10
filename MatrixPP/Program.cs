@@ -9,24 +9,7 @@ using System.Diagnostics;
 
 class Program
 {
-    static void PrintMatrix(Matrix matrix)
-    {
-        for (var i = 0; i < matrix.GetDimension()[0]; i++)
-        {
-            Console.Write("[");
-            for (var j = 0; j < matrix.GetDimension()[1]; j++)
-            {
-                Console.Write(matrix.Data[i, j].ToString().PadLeft(10));
-                if (j + 1 < matrix.GetDimension()[1])
-                {
-                    Console.Write(",");
-                }
-            }
-            Console.Write("]");
 
-            Console.WriteLine();
-        }
-    }
 
     static void Main(string[] args)
     {
@@ -36,8 +19,6 @@ class Program
         bool checkTranspose = false;
         bool timeTest = false;
         bool checkMP = true;
-
-        Console.WriteLine("Программа для умножения матриц");
 
         //var a = GetMatrixFromConsole("A");
         //var b = GetMatrixFromConsole("B");
@@ -52,11 +33,7 @@ class Program
         
         if (checkMP)
         {
-            double[] coefficienst = new double[] {1, 1, 1};
-            Matrix matrix = Matrix.E(3, 3);
-            MatrixPolynomial mp = new MatrixPolynomial(coefficienst);
-            Matrix res = mp.Calculate(matrix);
-            PrintMatrix(res);
+            
         }
 
         if (timeTest)
@@ -75,7 +52,6 @@ class Program
 
         if (checkProduct)
         {
-            InstanceThreadPool thread_pool = new InstanceThreadPool(4, Name: "Обработчик матриц");
             
             var sw = new Stopwatch();
 
@@ -93,7 +69,7 @@ class Program
 
             sw.Reset();
             sw.Start();
-            var result1 = matrixA.ParallelProductThreadPool(matrixB, thread_pool);
+            var result1 = matrixA.ParallelProductThreadPool(matrixB);
             sw.Stop();
             Console.WriteLine($"Product Parallel + ThreadPool: {sw.Elapsed}");
             //Console.WriteLine(result1.Data[4, 4]);
@@ -104,7 +80,6 @@ class Program
         if (checkSum)
         {
             
-            InstanceThreadPool thread_pool = new InstanceThreadPool(4, Name: "Обработчик матриц");
             
             var sw = new Stopwatch();
 
@@ -122,7 +97,7 @@ class Program
 
             sw.Reset();
             sw.Start();
-            var result1 = matrixA.ParallelSumThreadPool(matrixB, thread_pool);
+            var result1 = matrixA.ParallelSumThreadPool(matrixB);
             sw.Stop();
             Console.WriteLine($"Sum Parallel + ThreadPool: {sw.Elapsed}");
             //Console.WriteLine(result1.Data[4, 4]);
@@ -132,7 +107,6 @@ class Program
 
         if (checkPow)
         {
-            InstanceThreadPool thread_pool = new InstanceThreadPool(4, Name: "Обработчик матриц");
 
             int power = 10;
             var sw = new Stopwatch();
@@ -151,7 +125,7 @@ class Program
 
             sw.Reset();
             sw.Start();
-            var result22 = matrixA.ParallelPowThreadPool(power, thread_pool);
+            var result22 = matrixA.ParallelPowThreadPool(power);
             sw.Stop();
             Console.WriteLine($"Pow Parallel + ThreadPool: {sw.Elapsed}");
 
@@ -163,7 +137,7 @@ class Program
 
             sw.Reset();
             sw.Start();
-            var result32 = matrixA.ParallelPowBinThreadPool(power, thread_pool);
+            var result32 = matrixA.ParallelPowBinThreadPool(power);
             sw.Stop();
             Console.WriteLine($"Pow Parallel + Bin + ThreadPool: {sw.Elapsed}");
             //Console.WriteLine(result1.Data[4, 4]);

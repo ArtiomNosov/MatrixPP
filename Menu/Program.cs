@@ -4,6 +4,24 @@ namespace Menu
 {
     internal class Program
     {
+        static void PrintMatrix(Matrix matrix)
+        {
+            for (var i = 0; i < matrix.GetDimension()[0]; i++)
+            {
+                Console.Write("[");
+                for (var j = 0; j < matrix.GetDimension()[1]; j++)
+                {
+                    Console.Write(matrix.Data[i, j].ToString().PadLeft(10));
+                    if (j + 1 < matrix.GetDimension()[1])
+                    {
+                        Console.Write(",");
+                    }
+                }
+                Console.Write("]");
+
+                Console.WriteLine();
+            }
+        }
         enum MenuStatus
         {
             Finish,
@@ -16,15 +34,19 @@ namespace Menu
             "2 - сложить две матрицы",
             "3 - умножить две матрицы",
             "4 - возвести матрицу в степень",
-            "5 - транспонировать мтарицу"
+            "5 - транспонировать мтарицу",
+            "6 - посчитать матричный полином с коэффициентам (1, 1, 1)"
         };
         static void PrintArray<T>(T[] array)
         {
             foreach (var item in array)
                 Console.WriteLine(item);
         }
-        static void Main(string[] args)
+        static void Main()
         {
+            uint dim = 0;
+            Matrix matrixB = new Matrix(0, 0);
+            Matrix matrixA = new Matrix(0, 0);
             MenuStatus menuStatus = MenuStatus.Start;
             while (menuStatus == MenuStatus.Start)
             {
@@ -162,7 +184,8 @@ namespace Menu
                     case ConsoleKey.NumPad0:
                         break;
                     case ConsoleKey.NumPad1:
-                        
+                        matrixA = Matrix.GetRandomMatrix(dim, dim);
+                        matrixB = Matrix.GetRandomMatrix(dim, dim);
                         break;
                     case ConsoleKey.NumPad2:
                         break;
@@ -175,6 +198,10 @@ namespace Menu
                     case ConsoleKey.NumPad6:
                         break;
                     case ConsoleKey.NumPad7:
+                        double[] coefficienst = new double[] { 1, 1, 1 };
+                        MatrixPolynomial mp = new MatrixPolynomial(coefficienst);
+                        Matrix res = mp.Calculate(matrixA);
+                        PrintMatrix(res);
                         break;
                     case ConsoleKey.NumPad8:
                         break;
