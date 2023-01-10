@@ -43,7 +43,6 @@ public class Matrix
     public static Matrix GetRandomMatrix(uint n, uint m)
     {
         
-        //var new_matrix = new Matrix(n, m);
         var data = new double[n, m];
         System.Random rnd = new Random();
         for (int i = 0; i < n; i++)
@@ -51,7 +50,6 @@ public class Matrix
             for (int j = 0; j < m; j++)
             {
                 data[i, j] = rnd.Next() % 256;
-                //Console.WriteLine($"New value is {data[i, j]}");
             }
         }
         var new_matrix = new Matrix(data);
@@ -106,11 +104,7 @@ public class Matrix
     //3.1 Сумма двух матриц
     public static Matrix operator+(Matrix matrixA, Matrix matrixB)
     {
-        /* 
-        Перегрузка оператора сложения для двух матриц
-        */
 
-        // исключение в случае несовпадения размерностей матриц
         if (matrixA.GetDimension()[0] != matrixB.GetDimension()[0] || matrixA.GetDimension()[1] != matrixB.GetDimension()[1])
         {
             throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
@@ -131,20 +125,12 @@ public class Matrix
 
     public Matrix ParallelSum(Matrix another)
     {
-        /* 
-        Метод параллельного сложения двух матриц
-        */
-
-        // исключение в случае несовпадения размерностей матриц
         if (another.GetDimension()[0] != GetDimension()[0] || another.GetDimension()[1] != GetDimension()[1])
         {
             throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
         }
         
-        // результирующая матрица
         var res_matrix = new Matrix(another.GetDimension()[0], another.GetDimension()[1]);
-
-        // параллелим для каждой строчки
 
         Parallel.For(0, another.GetDimension()[0], i =>
         {
@@ -169,13 +155,11 @@ public class Matrix
         Метод параллельного сложения двух матриц с использованием кастомного threadpool
         */
 
-        // исключение в случае несовпадения размерностей матриц
         if (another.GetDimension()[0] != GetDimension()[0] || another.GetDimension()[1] != GetDimension()[1])
         {
             throw new Exception("Сложение не возможно! Размерность первой матрицы не равно размерности второй матрицы.");
         }
 
-        // результирующая матрица
         var res_matrix = new Matrix(another.GetDimension()[0], another.GetDimension()[1]);
 
 
@@ -200,9 +184,6 @@ public class Matrix
     // 3.2 Умножение матрицы на матрицу
     public static Matrix operator *(Matrix matrixA, Matrix matrixB)
     {
-        /* 
-        Перегрузка оператора умножения для двух матриц
-        */
 
         if (matrixA.GetDimension()[1] != matrixB.GetDimension()[0])
         {
@@ -229,9 +210,6 @@ public class Matrix
 
     public Matrix ParallelProduct(Matrix another)
     {
-        /* 
-        Метод параллельного умножения двух матриц
-        */
 
         if (GetDimension()[1] != another.GetDimension()[0])
         {
@@ -268,9 +246,6 @@ public class Matrix
 
     public Matrix ParallelProductThreadPool(Matrix another, InstanceThreadPool thread_pool)
     {
-        /* 
-        Метод параллельного умножения двух матриц с использованием кастомного threadpool
-        */
 
         if (GetDimension()[1] != another.GetDimension()[0])
         {
@@ -296,9 +271,6 @@ public class Matrix
     //3.3 Возведение матрицы в степень (наиболее важный метод для матричных полиномов)
     public static Matrix operator^(Matrix matrix, int n)
     {
-        /*
-        Метод непараллельного возведения матрицы в степень
-        */
 
         if (n == 0) {
             return E(matrix.GetDimension()[0], matrix.GetDimension()[1]);
@@ -315,9 +287,6 @@ public class Matrix
 
     public Matrix ParallelPow(int n)
     {
-        /*
-        Параллельное умножение матриц 
-        */
         if (n == 0) {
             return E(GetDimension()[0], GetDimension()[1]);
         }
@@ -333,9 +302,6 @@ public class Matrix
 
     public Matrix ParallelPowThreadPool(int n, InstanceThreadPool thread_pool)
     {
-        /*
-        Параллельное умножение матриц с использованием кастомного threadpool
-        */
         if (n == 0) {
             return E(GetDimension()[0], GetDimension()[1]);
         }
@@ -352,7 +318,7 @@ public class Matrix
 public Matrix ParallelPowBin(int n)
     {
         /*
-        Считаем матрицы во всем степенях двойки, не превосходящие максимальной степени лвойки в двоичном 
+        Считаем матрицы во всем степенях двойки, не превосходящие максимальной степени двойки в двоичном 
         разложении. После чего происходит параллельное умножение полученных матриц.
         */
         
@@ -441,10 +407,6 @@ public Matrix ParallelPowBin(int n)
         
         return res;
     }
-
-
-    // 4. Линейные преобразования
-
     public Matrix ParallelProduct(double number)
     {
         Matrix res = new Matrix(GetDimension()[0], GetDimension()[1]);
